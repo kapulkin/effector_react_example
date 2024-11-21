@@ -1,7 +1,12 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store';
-import { fetchUserProfile, updateUserProfile } from '../features/userSlice';
+import { useStore, useEvent } from 'effector-react';
+import {
+  $profile,
+  $isLoading,
+  $error,
+  fetchUserProfileFx,
+  updateUserProfileFx,
+} from '../store';
 import {
   Container,
   Paper,
@@ -14,17 +19,16 @@ import {
 } from '@mui/material';
 
 export const Profile: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { profile, isLoading, error } = useSelector(
-    (state: RootState) => state.user
-  );
+  const profile = useStore($profile);
+  const isLoading = useStore($isLoading);
+  const error = useStore($error);
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState(profile);
 
   useEffect(() => {
-    dispatch(fetchUserProfile());
-  }, [dispatch]);
+    fetchUserProfileFx();
+  }, []);
 
   useEffect(() => {
     setFormData(profile);
@@ -32,7 +36,7 @@ export const Profile: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await dispatch(updateUserProfile(formData));
+    await updateUserProfileFx(formData);
     setEditMode(false);
   };
 
